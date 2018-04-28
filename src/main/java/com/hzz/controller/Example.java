@@ -29,7 +29,6 @@ public class Example {
     @RequestMapping(value ="/login", method = RequestMethod.POST)
     @ResponseBody
     public String login(@RequestParam String name,@RequestParam  String password) throws CommonException {
-        userService.login(name,password);
         return "userName:"+name+" userPassword:"+password;
     }
 
