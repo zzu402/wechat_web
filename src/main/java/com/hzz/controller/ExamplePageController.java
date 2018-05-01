@@ -2,6 +2,8 @@ package com.hzz.controller;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+
 @Controller
 public class ExamplePageController {
     @RequestMapping(value ="/ui-elements", method = RequestMethod.GET)
@@ -36,5 +38,16 @@ public class ExamplePageController {
     @RequestMapping(value ="/empty", method = RequestMethod.GET)
     public String emptyPage(){
         return "example/empty";
+    }
+
+
+    @RequestMapping(value ="/login", method = RequestMethod.GET)
+    public String loginPage(){
+        return "example/login";
+    }
+    @RequestMapping(value ="/login", method = RequestMethod.POST)
+    public String login(@RequestParam String userName,@RequestParam String userPassword){
+        System.out.println(userName+"--"+userPassword);
+        return "example/index";
     }
 }
