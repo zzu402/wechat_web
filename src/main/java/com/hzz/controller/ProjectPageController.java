@@ -22,8 +22,15 @@ public class ProjectPageController {
     }
 
     @Privileges(PrivilegeConstant.LOGIN_WEB)
-    @RequestMapping(value = "/index", method = RequestMethod.GET)
+    @RequestMapping(value = {"/index","/",""}, method = RequestMethod.GET)
     public String indexPage() {
         return "project/index";
+    }
+
+
+    @Privileges(PrivilegeConstant.LOGIN_WEB)
+    @RequestMapping(value = "/history", method = RequestMethod.GET)
+    public String historyPage() {
+        return "project/history";
     }
 }

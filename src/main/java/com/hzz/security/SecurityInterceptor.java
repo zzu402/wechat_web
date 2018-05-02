@@ -55,7 +55,8 @@ public class SecurityInterceptor implements HandlerInterceptor {
                  roleId=userRole.getId();
         }
         if(privileges!=null&&!userRoleService.checkPrivileges(roleId,privileges.value())){
-            writeError(response,400,"您没有权限访问页面");
+//            writeError(response,400,"您没有权限访问页面");
+            response.sendRedirect("/login");
             return false;
         }
         return true;
