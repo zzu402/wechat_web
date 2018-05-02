@@ -77,13 +77,42 @@
                     </div>
                     <div class="form-group">
                         <div class="col-sm-offset-2 col-sm-10">
-                            <button type="button" class="btn btn-primary">验证</button>
+                            <button type="button" onclick="verify()" class="btn btn-primary">验证</button>
                         </div>
                     </div>
                 </form>
             </div>
         </div>
     </div>
+
+    <script>
+
+
+
+        function verify() {
+            var phone = $("#phone").val();
+            var code = $("#code").val()
+            if (!phone) {
+                alert("请输入手机号码");
+                return;
+            }
+            if (!code) {
+                alert("请输入验证码");
+                return;
+            }
+            var formData = {
+                "phone": phone,
+                "code": code
+            }
+            formPost4Json("/verify/addFriendAndSendCode", formData, function (data, httpOptions, status) {
+                if (checkErrorDatas(data, httpOptions)) {
+                    alert("提交验证成功，请在验证历史查询验证状态...")
+                }
+            });
+        }
+
+
+    </script>
 
 
 </div>
@@ -92,5 +121,7 @@
 <script src="../assets/js/jquery-1.10.2.js"></script>
 <!-- Bootstrap Js -->
 <script src="../assets/js/bootstrap.min.js"></script>
+<script src="../assets/js/httpUtil.js"></script>
+<script src="../assets/js/platform.js"></script>
 
 </html>

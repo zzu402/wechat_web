@@ -1,6 +1,7 @@
 package com.hzz;
 
 import com.hzz.security.SecurityInterceptor;
+import com.hzz.service.VerifyService;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -26,6 +27,10 @@ public class App extends WebMvcConfigurerAdapter {
 
     public static void main(String[] args){
         ConfigurableApplicationContext applicationContext = SpringApplication.run(App.class, args);
+
+        //不断去处理
+        VerifyService verifyService=applicationContext.getBean(VerifyService.class);
+        verifyService.doVerifyOperation();
     }
 
     @Override
@@ -38,6 +43,7 @@ public class App extends WebMvcConfigurerAdapter {
     SecurityInterceptor getSecurityInterceptor() {
         return new SecurityInterceptor();
     }
+
 
 
 }

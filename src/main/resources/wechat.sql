@@ -85,3 +85,17 @@ CREATE TABLE `wechat_user_role` (
 -- ----------------------------
 -- Records of wechat_user_role
 -- ----------------------------
+
+DROP TABLE IF EXISTS `wechat_verify_info`;
+CREATE TABLE `wechat_verify_info` (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT,
+  `userId` bigint(20) DEFAULT NULL COMMENT '用户ID',
+  `verifyPhone` varchar(20) NOT NULL COMMENT '添加好友手机号',
+  `verifyCode` varchar(20) NOT NULL COMMENT '好友求助验证码',
+  `status` int(11) NOT NULL DEFAULT '0' COMMENT '0-创建 1-正在验证 2-验证通过 3-验证失败',
+  `comments` varchar(500) DEFAULT NULL COMMENT '备注信息',
+  `createTime` bigint(20) DEFAULT NULL COMMENT '创建时间(秒)',
+  `updateTime` bigint(20) DEFAULT NULL COMMENT '上次修改时间(秒)',
+  `version` int(11) DEFAULT '0' COMMENT '版本号',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='用户验证表';
