@@ -37,7 +37,7 @@ public class UserRoleService {
                     try {
                         Map<Long, UserRole> roleMap = new LinkedHashMap<>();
                         UserRole condition = new UserRole();
-                        condition.orderBy("roleType,name");
+                        condition.orderBy("roleType");
                         List<UserRole> roles = dao.select(condition);
                         for (UserRole role : roles) {
                             List<UserPrivilege> privileges = privilegeService.getUserPrivileges(role.getPrivileges());

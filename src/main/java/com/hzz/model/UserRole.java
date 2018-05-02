@@ -4,7 +4,7 @@ import com.hzz.common.dao.annotation.Column;
 import com.hzz.common.dao.annotation.Table;
 import com.hzz.common.dao.annotation.Version;
 
-@Table("wechat_user")
+@Table("wechat_user_role")
 public class UserRole  extends AbstractModel<UserRole> {
     @Column(pk=true)
     private Long id;

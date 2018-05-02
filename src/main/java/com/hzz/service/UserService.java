@@ -5,10 +5,12 @@ import com.hzz.common.dao.ModelDao;
 import com.hzz.exception.CommonException;
 import com.hzz.model.User;
 import com.hzz.utils.StringUtil;
+import com.hzz.utils.WechatExceptionHelper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 
 
@@ -24,20 +26,16 @@ public class UserService {
     private ModelDao dao;
 
     @Transactional(rollbackFor = {CommonException.class, RuntimeException.class, Error.class})
-    public User login(String userName, String password) throws CommonException {
-        String randomPwdKey = String.format("PWD_WEB_%s",userName );
-        String randomPwd = CacheManager.getCacheService().get(randomPwdKey);//从缓存中获取随机密码
+    public User login(String userName, String password, HttpServletRequest request) throws CommonException {
         User user = null;
         user = getUserByName(userName);
-        if (null == user)
-//            throw InsuranceExceptionHelper.userException("您还未注册，请使用验证码登录", null);
-        if (StringUtil.isBlank(user.getPassword()) && StringUtil.isBlank(randomPwd))
-//            throw InsuranceExceptionHelper.userException("您还未设置密码，请使用验证码登录后在个人中心修改密码", null);
-        if(StringUtil.isBlank(password) || !(password.equalsIgnoreCase(randomPwd) || password.equalsIgnoreCase(user.getPassword()))){
-//            throw InsuranceExceptionHelper.insuranceRuntimeException("账号或密码错误", null);
+        if (null == user){
+            throw WechatExceptionHelper.userException("账号不存在，请联系QQ:415354918获取账号", null);
         }
-
-        CacheManager.getCacheService().delete(randomPwdKey);//验证通过删除随机密码
+        if(StringUtil.isBlank(password) || !password.equalsIgnoreCase(user.getPassword())){
+            throw WechatExceptionHelper.wechatRuntimeException("账号或密码错误", null);
+        }
+        request.getSession().setAttribute("userId",user.getId());
         return user;
     }
 
@@ -111,6 +109,17 @@ public class UserService {
             return null;
         User condition = new User();
         condition.setName(userName);
+        List<User> list = dao.select(condition);
+        if (list.isEmpty())
+            return null;
+        return list.get(0);
+    }
+
+    public User getUserById(Long userId) throws CommonException{
+        if(userId==null||userId<=0)
+            return  null;
+        User condition=new User();
+        condition.setId(userId);
         List<User> list = dao.select(condition);
         if (list.isEmpty())
             return null;

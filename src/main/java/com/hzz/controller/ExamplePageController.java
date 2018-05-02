@@ -1,4 +1,6 @@
 package com.hzz.controller;
+import com.hzz.security.PrivilegeConstant;
+import com.hzz.security.annotation.Privileges;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -11,10 +13,10 @@ public class ExamplePageController {
         return "example/ui-elements";
     }
 
-    @RequestMapping(value ="/index", method = RequestMethod.GET)
-    public String indexPage(){
-        return "example/index";
-    }
+//    @RequestMapping(value ="/index", method = RequestMethod.GET)
+//    public String indexPage(){
+//        return "example/index";
+//    }
 
     @RequestMapping(value ="/chart", method = RequestMethod.GET)
     public String chartPage(){
@@ -41,13 +43,13 @@ public class ExamplePageController {
     }
 
 
-    @RequestMapping(value ="/login", method = RequestMethod.GET)
-    public String loginPage(){
-        return "example/login";
-    }
-    @RequestMapping(value ="/login", method = RequestMethod.POST)
-    public String login(@RequestParam String userName,@RequestParam String userPassword){
-        System.out.println(userName+"--"+userPassword);
-        return "example/index";
-    }
+//    @RequestMapping(value ="/login", method = RequestMethod.GET)
+//    public String loginPage(){
+//        return "example/login";
+//    }
+//    @RequestMapping(value ="/login", method = RequestMethod.POST)
+//    public String login(@RequestParam String userName,@RequestParam String userPassword){
+//        System.out.println(userName+"--"+userPassword);
+//        return "example/index";
+//    }
 }
