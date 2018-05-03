@@ -49,7 +49,7 @@
         <!--左侧导航栏-->
 
         <nav class="navbar-default navbar-side" role="navigation">
-            <div class="sidebar-collapse">
+            <div class="sidebar-collapse" id="app">
                 <ul class="nav" id="main-menu">
 
                     <li>
@@ -57,6 +57,11 @@
                     </li>
                     <li>
                         <a class="active-menu" href="history.html"><i class="fa fa-desktop"></i> 验证历史</a>
+                    </li>
+                    <li v-if="privileges.user_register" >
+                        <a  class="active-menu" href="register.html">
+                            <i class="fa fa-tasks fa-fw"></i> 添加账户
+                        </a>
                     </li>
                 </ul>
             </div>
@@ -75,3 +80,14 @@
 </body>
 
 </html>
+
+<script>
+    $(function(){
+        var app = new Vue({
+            el: '#app',
+            data: {
+                privileges: getCacheFromSessionStorage("privileges")
+            }
+        })
+    });
+</script>

@@ -33,4 +33,10 @@ public class ProjectPageController {
     public String historyPage() {
         return "project/history";
     }
+
+    @Privileges(PrivilegeConstant.LOGIN_ADMIN)
+    @RequestMapping(value = "/register", method = RequestMethod.GET)
+    public String RegisterPage() {
+        return "project/register";
+    }
 }

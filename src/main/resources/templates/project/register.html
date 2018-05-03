@@ -49,13 +49,13 @@
             <ul class="nav" id="main-menu">
 
                 <li>
-                    <a class="active-menu" href="index.html"><i class="fa fa-dashboard"></i> 号码验证</a>
+                    <a href="index.html"><i class="fa fa-dashboard"></i> 号码验证</a>
                 </li>
                 <li>
                     <a href="history.html"><i class="fa fa-desktop"></i> 验证历史</a>
                 </li>
                 <li v-if="privileges.user_register" >
-                    <a href="register.html">
+                    <a  class="active-menu" href="register.html">
                             <i class="fa fa-tasks fa-fw"></i> 添加账户
                     </a>
                 </li>
@@ -70,17 +70,17 @@
         <div id="page-inner">
             <div class="well col-md-6 col-centered">
                 <form class="form-horizontal" role="form">
-                    <div class="form-group"><label for="phone" class="col-sm-2 control-label">微信手机号</label>
-                        <div class="col-sm-4"><input class="form-control" type="text" id="phone"
-                                                     placeholder="请输入手机号"></div>
+                    <div class="form-group"><label for="userName" class="col-sm-2 control-label">用户名</label>
+                        <div class="col-sm-4"><input class="form-control" type="text" id="userName"
+                                                     placeholder="请输入用户名"></div>
                     </div>
-                    <div class="form-group"><label for="code" class="col-sm-2 control-label">微信验证码</label>
-                        <div class="col-sm-4"><input class="form-control" type="text" id="code" placeholder="请输入验证码">
+                    <div class="form-group"><label for="password" class="col-sm-2 control-label">密码</label>
+                        <div class="col-sm-4"><input class="form-control" type="password" id="password" placeholder="请输入密码">
                         </div>
                     </div>
                     <div class="form-group">
                         <div class="col-sm-offset-2 col-sm-10">
-                            <button type="button" onclick="verify()" class="btn btn-primary">验证</button>
+                            <button type="button" onclick="register()" class="btn btn-primary">注册</button>
                         </div>
                     </div>
                 </form>
@@ -92,24 +92,24 @@
 
 
 
-        function verify() {
-            var phone = $("#phone").val();
-            var code = $("#code").val()
-            if (!phone) {
-                alert("请输入手机号码");
+        function register() {
+            var userName = $("#userName").val();
+            var password = $("#password").val()
+            if (!userName) {
+                alert("请输入用户名");
                 return;
             }
-            if (!code) {
-                alert("请输入验证码");
+            if (!password) {
+                alert("请输入密码");
                 return;
             }
             var formData = {
-                "phone": phone,
-                "code": code
+                "userName": userName,
+                "password": $.md5(password)
             }
-            formPost4Json("/verify/addFriendAndSendCode", formData, function (data, httpOptions, status) {
+            formPost4Json("/user/register", formData, function (data, httpOptions, status) {
                 if (checkErrorDatas(data, httpOptions)) {
-                    alert("提交验证成功，请在验证历史查询验证状态...")
+                    alert("注册成功");
                 }
             });
         }
@@ -127,6 +127,7 @@
 <script src="../assets/js/httpUtil.js"></script>
 <script src="../assets/js/platform.js"></script>
 <script src="../assets/js/common.js"></script>
+<script src="../assets/js/jquery.md5.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/vue"></script>
 <script>
     $(function(){

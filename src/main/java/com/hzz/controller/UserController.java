@@ -1,6 +1,8 @@
 package com.hzz.controller;
 
 import com.hzz.exception.CommonException;
+import com.hzz.security.PrivilegeConstant;
+import com.hzz.security.annotation.Privileges;
 import com.hzz.service.UserService;
 import com.hzz.utils.RestResultHelper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,7 +24,15 @@ public class UserController {
     @RequestMapping(value ="/login", method = RequestMethod.POST)
     public Map<String,Object> login(@RequestParam String userName, @RequestParam String password, HttpServletRequest request) throws CommonException {
         Map<String,Object>result= RestResultHelper.success();
-        userService.login(userName,password,request);
+        userService.login(userName,password,request,result);
+        return result;
+    }
+
+    @Privileges(PrivilegeConstant.USER_REGISTER)
+    @RequestMapping(value ="/register", method = RequestMethod.POST)
+    public Map<String,Object> register(@RequestParam String userName, @RequestParam String password, HttpServletRequest request) throws CommonException {
+        Map<String,Object>result= RestResultHelper.success();
+        userService.register(userName,"",0,"",password);
         return result;
     }
 }
