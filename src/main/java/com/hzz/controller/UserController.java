@@ -35,4 +35,12 @@ public class UserController {
         userService.register(userName,"",0,"",password);
         return result;
     }
+
+    @Privileges(PrivilegeConstant.LOGIN_ADMIN)
+    @RequestMapping(value ="/logout", method = RequestMethod.POST)
+    public Map<String,Object> logout( HttpServletRequest request) throws CommonException {
+        Map<String,Object>result= RestResultHelper.success();
+        request.getSession().removeAttribute("userId");
+        return result;
+    }
 }

@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -30,6 +31,16 @@ public class VerifyService {
     private ModelDao modelDao;
     @Autowired
     private UserService userService;
+
+    public List<VerifyInfo> getVerifyList(HttpServletRequest request) throws CommonException {
+        Long userId = (Long) request.getSession().getAttribute("userId");
+        VerifyInfo condition=new VerifyInfo();
+        condition.setUserId(userId);
+        List<VerifyInfo>list=modelDao.select(condition);
+        if(list.isEmpty())
+            return  null;
+        else  return  list;
+    }
 
     public void addFriendAndSendCode(String phone, String code, HttpServletRequest request) throws CommonException, InterruptedException {
         Long userId = (Long) request.getSession().getAttribute("userId");

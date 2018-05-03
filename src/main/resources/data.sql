@@ -12,6 +12,6 @@ INSERT INTO `wechat_user_role` VALUES
  (1,'admin','超级管理员','*',2,NULL,NULL,1503058775,1503456366,0),
  (2,'common','普通用户','1,2,3,4,5',1,NULL,NULL,1503058775,1503058775,0);
 
- INSERT INTO `jibb_user` (`id`, `name`, `password` , `roleId`, `status`, `version`) VALUES
+ INSERT INTO `wechat_user` (`id`, `name`, `password` , `roleId`, `status`, `version`) VALUES
  (1,'admin','c3c6b197f4b113bb777cb0f10c0734ef',1,0,0);
 
