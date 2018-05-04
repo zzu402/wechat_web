@@ -39,4 +39,10 @@ public class ProjectPageController {
     public String RegisterPage() {
         return "project/register";
     }
+    @Privileges(PrivilegeConstant.LOGIN_ADMIN)
+    @RequestMapping(value = "/user", method = RequestMethod.GET)
+    public String UserPage() {
+        return "project/user";
+    }
+
 }

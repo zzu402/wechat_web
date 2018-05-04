@@ -49,6 +49,10 @@ public class UserService {
         return user;
     }
 
+    public List<User> getUserList() throws CommonException {
+        return dao.select(new User());
+    }
+
     @Transactional(rollbackFor = {CommonException.class, RuntimeException.class, Error.class})
     public User register(String userName, String nickName, int sex, String phone, String password) throws CommonException {
         if(StringUtil.isBlank(userName)){

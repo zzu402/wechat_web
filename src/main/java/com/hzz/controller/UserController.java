@@ -36,6 +36,14 @@ public class UserController {
         return result;
     }
 
+    @Privileges(PrivilegeConstant.USER_REGISTER)
+    @RequestMapping(value ="/getUserList", method = RequestMethod.POST)
+    public Map<String,Object> getUserList( HttpServletRequest request) throws CommonException {
+        Map<String,Object>result= RestResultHelper.success();
+        result.put("userList",userService.getUserList());
+        return result;
+    }
+
     @Privileges(PrivilegeConstant.LOGIN_ADMIN)
     @RequestMapping(value ="/logout", method = RequestMethod.POST)
     public Map<String,Object> logout( HttpServletRequest request) throws CommonException {

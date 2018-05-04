@@ -57,7 +57,7 @@
                         <a href="index.html"><i class="fa fa-dashboard"></i> 号码验证</a>
                     </li>
                     <li>
-                        <a class="active-menu" href="history.html"><i class="fa fa-desktop"></i> 验证历史</a>
+                        <a  href="history.html"><i class="fa fa-desktop"></i> 验证历史</a>
                     </li>
                     <li v-if="privileges.user_register">
                         <a href="register.html">
@@ -65,7 +65,7 @@
                         </a>
                     </li>
                     <li v-if="privileges.user_register">
-                        <a   href="user.html">
+                        <a  class="active-menu" href="user.html">
                             <i class="fa fa-tasks fa-fw"></i> 用户列表
                         </a>
                     </li>
@@ -91,20 +91,18 @@
                                            id="dataTables-example">
                                         <thead>
                                         <tr >
-                                            <th>手机号码</th>
-                                            <th>备注</th>
-                                            <th>验证码</th>
-                                            <th>验证时间</th>
-                                            <th>验证状态</th>
+                                            <th>用户名</th>
+                                            <th>密钥</th>
+                                            <th>公钥</th>
+                                            <th>创建时间</th>
                                         </tr>
                                         </thead>
                                         <tbody>
-                                        <tr class="odd gradeX" v-for=" item in verifyList">
-                                            <td>{{item.verifyPhone}}</td>
-                                            <td>{{item.comments}}</td>
-                                            <td>{{item.verifyCode}}</td>
-                                            <td >{{item.updateTime|time}}</td>
-                                            <td class="center">{{item.status |verifyStatus}}</td>
+                                        <tr class="odd gradeX" v-for=" item in userList">
+                                            <td>{{item.name}}</td>
+                                            <td>{{item.secretKey}}</td>
+                                            <td>{{item.userKey}}</td>
+                                            <td >{{item.createTime|time}}</td>
                                         </tr>
                                         </tbody>
                                     </table>
@@ -138,7 +136,7 @@
             el: '#app',
             data: {
                 privileges: getCacheFromSessionStorage("privileges"),
-                verifyList:[]
+                userList:[]
             },
             filters:{
                 time:function (value) {
@@ -167,27 +165,15 @@
                     <!-- 获取时间格式 2017-01-03 10:13:48 -->
                      var t = Y+'-'+m+'-'+d+' '+H+':'+i+':'+s;
                     return t;
-                },
-                verifyStatus:function (status) {
-                    if(status==0)
-                        return  "创建";
-                    else if(status==1)
-                        return "正在验证";
-                    else if(status==2)
-                        return "验证通过";
-                    else if(status==3)
-                        return "验证失败";
-                    else return "未知";
-
                 }
             }
         });
         var formData={
         }
-        formPost4Json("/verify/getVerifyList", formData, function (data, httpOptions, status) {
+        formPost4Json("/user/getUserList", formData, function (data, httpOptions, status) {
             if (checkErrorDatas(data,httpOptions)) {
-                if(data.verifyList){
-                    app.verifyList=data.verifyList;
+                if(data.userList){
+                    app.userList=data.userList;
                 }
             }
         });
