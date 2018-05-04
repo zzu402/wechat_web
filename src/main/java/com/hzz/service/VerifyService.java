@@ -36,6 +36,7 @@ public class VerifyService {
         Long userId = (Long) request.getSession().getAttribute("userId");
         VerifyInfo condition=new VerifyInfo();
         condition.setUserId(userId);
+        condition.orderBy("createTime desc");
         List<VerifyInfo>list=modelDao.select(condition);
         if(list.isEmpty())
             return  null;
@@ -73,6 +74,15 @@ public class VerifyService {
         }
     }
 
+    public  void updateVerifyStatus(Long verifyId,Integer status) throws CommonException {
+        VerifyInfo condition=new VerifyInfo();
+        condition.setId(verifyId);
+        VerifyInfo update=new VerifyInfo();
+        update.setStatus(status);
+        update.setUpdateTime(System.currentTimeMillis()/1000);
+        modelDao.update(update,condition);
+    }
+
     public void doVerifyOperation() {
         while (true) {//不断地处理消息队列
             try {
@@ -85,6 +95,7 @@ public class VerifyService {
                 User user = userService.getUserById(userId);
                 WebSocketServer socketServer=WebSocketServer.getWebSocket(user.getName());
                 socketServer.sendMessage(json);
+                updateVerifyStatus(verifyInfoId,1);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             } catch (CommonException e) {

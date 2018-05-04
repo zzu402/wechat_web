@@ -14,13 +14,12 @@ import javax.websocket.server.PathParam;
 import javax.websocket.server.ServerEndpoint;
 
 import com.hzz.cache.CacheManager;
+import com.hzz.common.dao.ModelDao;
 import com.hzz.exception.CommonException;
 import com.hzz.model.User;
 import com.hzz.service.UserService;
-import com.hzz.utils.JsonMapper;
-import com.hzz.utils.LogUtils;
-import com.hzz.utils.RestResultHelper;
-import com.hzz.utils.SpringUtils;
+import com.hzz.service.VerifyService;
+import com.hzz.utils.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 //@ServerEndpoint(value = "/websocket")
@@ -67,28 +66,43 @@ public class WebSocketServer {
         LogUtils.info(WebSocketServer.class,"接收到来自 "+user+" 的消息:"+message);
         Map<String,Object> verifyMap= JsonMapper.nonEmptyMapper().fromJson(message, Map.class);
         String secretKey= (String) verifyMap.get("secretkey");
-        if(secretKey!=null){
-            try {
-                UserService userService= (UserService) SpringUtils.getBean(UserService.class);
-                User u=userService.getUserByName(user);
-                if(u.getSecretKey().equals(secretKey)){
-                    CacheManager.getCacheService().set(String.format("CLIENT_USER_%s", user),u.getId().toString());
-                    sendMessage(JsonMapper.nonDefaultMapper().toJson(RestResultHelper.success()));
-                }else {
-                    CacheManager.getCacheService().delete(String.format("CLIENT_USER_%s", user));
-                    webSocketMap.remove(user);
-                    sendMessage(JsonMapper.nonDefaultMapper().toJson(RestResultHelper.fail("300","secretKey错误")));
-                }
-            } catch (CommonException e) {
-                webSocketMap.remove(user);
-                CacheManager.getCacheService().delete(String.format("CLIENT_USER_%s", user));
-                sendMessage(JsonMapper.nonDefaultMapper().toJson(RestResultHelper.fail("501","服务器异常")));
-                LogUtils.error(WebSocketServer.class,"查找用户异常",e);
+        String resultCode= (String) verifyMap.get("resultCode");
+        if(!StringUtil.isBlank(resultCode)){
+            Long verifyInfoId = (Integer) verifyMap.get("verifyInfoId")*1L;
+            Integer status =3;
+            if(resultCode.equals("success")){
+                status=2;
             }
-        }else{
-            CacheManager.getCacheService().delete(String.format("CLIENT_USER_%s", user));
-            sendMessage(JsonMapper.nonDefaultMapper().toJson(RestResultHelper.fail("301","secretKey非法")));
-            webSocketMap.remove(user);
+            VerifyService verifyService= (VerifyService) SpringUtils.getBean(VerifyService.class);
+            try {
+                verifyService.updateVerifyStatus(verifyInfoId,status);
+            } catch (CommonException e) {
+                LogUtils.error(WebSocketServer.class,"更新验证表单失败",e);
+            }
+        }else {
+            if (!StringUtil.isBlank(secretKey)) {
+                try {
+                    UserService userService = (UserService) SpringUtils.getBean(UserService.class);
+                    User u = userService.getUserByName(user);
+                    if (u.getSecretKey().equals(secretKey)) {
+                        CacheManager.getCacheService().set(String.format("CLIENT_USER_%s", user), u.getId().toString());
+                        sendMessage(JsonMapper.nonDefaultMapper().toJson(RestResultHelper.success()));
+                    } else {
+                        CacheManager.getCacheService().delete(String.format("CLIENT_USER_%s", user));
+                        webSocketMap.remove(user);
+                        sendMessage(JsonMapper.nonDefaultMapper().toJson(RestResultHelper.fail("300", "secretKey错误")));
+                    }
+                } catch (CommonException e) {
+                    webSocketMap.remove(user);
+                    CacheManager.getCacheService().delete(String.format("CLIENT_USER_%s", user));
+                    sendMessage(JsonMapper.nonDefaultMapper().toJson(RestResultHelper.fail("501", "服务器异常")));
+                    LogUtils.error(WebSocketServer.class, "查找用户异常", e);
+                }
+            } else {
+                CacheManager.getCacheService().delete(String.format("CLIENT_USER_%s", user));
+                sendMessage(JsonMapper.nonDefaultMapper().toJson(RestResultHelper.fail("301", "secretKey非法")));
+                webSocketMap.remove(user);
+            }
         }
     }
     /**
