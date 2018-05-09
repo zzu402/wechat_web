@@ -16,11 +16,16 @@
     <!-- Google Fonts-->
     <link href='https://fonts.googleapis.com/css?family=Open+Sans' rel='stylesheet' type='text/css'/>
 </head>
+<style  type="text/css">
+    [v-cloak] {
+        display: none;
+    }
+</style>
 
 <body>
 <!--顶部-->
 <div id="wrapper">
-    <div id="app">
+    <div id="app" v-cloak>
         <nav class="navbar navbar-default top-navbar" role="navigation">
             <div class="navbar-header">
                 <a class="navbar-brand" href="index.html">微信自助平台</a>
@@ -34,7 +39,7 @@
                         <i class="fa fa-user fa-fw"></i> <i class="fa fa-caret-down"></i>
                     </a>
                     <ul class="dropdown-menu dropdown-user">
-                        <li><a href="#"><i class="fa fa-user fa-fw"></i>我的资料</a>
+                        <li><a href="/user_profile"><i class="fa fa-user fa-fw"></i>我的资料</a>
                         </li>
 
                         <li><a onclick="logout()"><i class="fa fa-sign-out fa-fw"></i> 注销</a>

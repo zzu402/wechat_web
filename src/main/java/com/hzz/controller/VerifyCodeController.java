@@ -29,6 +29,7 @@ public class VerifyCodeController {
     @Autowired
     private VerifyService verifyService;
 
+    @Privileges(PrivilegeConstant.LOGIN_ADMIN)
     @RequestMapping(value ="/addFriendAndSendCode", method = RequestMethod.POST)
     public Map<String,Object> addFriendAndSendCode(@RequestParam String phone, @RequestParam String code,HttpServletRequest request) throws CommonException, InterruptedException {
         Map<String,Object>result= RestResultHelper.success();
@@ -36,7 +37,15 @@ public class VerifyCodeController {
         return result;
     }
 
-    @Privileges(PrivilegeConstant.LOGIN_ADMIN)
+    @RequestMapping(value ="/common_verify", method = RequestMethod.POST)
+    public Map<String,Object> verify(@RequestParam String k,@RequestParam String phone, @RequestParam String code,HttpServletRequest request) throws CommonException, InterruptedException {
+        Map<String,Object>result= RestResultHelper.success();
+        verifyService.verify(k,phone,code);
+        return result;
+    }
+
+
+    @Privileges(PrivilegeConstant.QUERY_VERIFY_HISTORY)
     @RequestMapping(value ="/getVerifyList", method = RequestMethod.POST)
     public Map<String,Object> getVerifyList(HttpServletRequest request) throws CommonException, InterruptedException {
         Map<String,Object>result= RestResultHelper.success();

@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>用户验证界面</title>
+    <link rel="stylesheet" href="../assets/css/login.css">
+    <script src="../assets/js/httpUtil.js"></script>
+    <script src="../assets/js/jquery-1.10.2.js"></script>
+    <script src="../assets/js/jquery.md5.js"></script>
+    <script src="../assets/js/platform.js"></script>
+    <script src="../assets/js/common.js"></script>
+</head>
+<body>
+<div class="login">
+    <form method="post">
+        <input id="phone" type="text"  placeholder="微信号" name="phone" required="required"/>
+        <input id="code" type="text" placeholder="验证码" name="code" required="required"/>
+        <button type="button" class="btn btn-primary btn-block btn-large" onclick="verify()">验证</button>
+    </form>
+</div>
+</body>
+</html>
+<script>
+    function verify() {
+
+        var k=getQueryString("k");
+        var phone=$("#phone").val();
+        var code=$("#code").val()
+        if(!phone){
+            alert("请输入微信号");
+            return;
+        }
+        if(!code){
+            alert("请输入验证码");
+            return;
+        }
+        var formData={
+            "phone":phone,
+            "code":code,
+            "k":k
+        }
+        formPost4Json("/verify/common_verify", formData, function (data, httpOptions, status) {
+            if (checkErrorDatas(data,httpOptions)) {
+                alert("提交验证成功，请在验证历史查询验证状态...");
+            }
+        });
+    }
+
+    function getQueryString(name) {
+        var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)", "i");
+        var r = window.location.search.substr(1).match(reg);
+        if (r != null) return unescape(r[2]);
+        return null;
+    }
+</script>
+
+

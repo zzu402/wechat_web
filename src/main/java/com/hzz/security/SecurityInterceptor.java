@@ -1,4 +1,5 @@
 package com.hzz.security;
+import com.hzz.cache.CacheManager;
 import com.hzz.common.dao.ModelDao;
 import com.hzz.exception.CommonException;
 import com.hzz.model.User;
@@ -7,6 +8,7 @@ import com.hzz.security.annotation.Privileges;
 import com.hzz.service.UserRoleService;
 import com.hzz.service.UserService;
 import com.hzz.utils.JsonMapper;
+import com.hzz.utils.WechatExceptionHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,7 +34,7 @@ public class SecurityInterceptor implements HandlerInterceptor {
 
 
     @Override
-    public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
+    public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws CommonException, Exception {
         try {
             return doPreHandle(request, response, (HandlerMethod) handler);
         } catch (CommonException e) {
@@ -55,7 +57,13 @@ public class SecurityInterceptor implements HandlerInterceptor {
                  roleId=userRole.getId();
         }
         if(privileges!=null&&!userRoleService.checkPrivileges(roleId,privileges.value())){
-//            writeError(response,400,"您没有权限访问页面");
+            request.getSession().removeAttribute("userId");
+            response.sendRedirect("/login");
+            return false;
+        }
+        String sessionId=CacheManager.getCacheService().get(String.format("USER_LOGIN_%s",userId));
+        if(sessionId!=null&&!request.getSession().getId().equals(sessionId)){
+            request.getSession().removeAttribute("userId");
             response.sendRedirect("/login");
             return false;
         }

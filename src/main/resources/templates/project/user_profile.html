@@ -15,23 +15,26 @@
     <link href="../assets/css/custom-styles.css" rel="stylesheet"/>
     <!-- Google Fonts-->
     <link href='https://fonts.googleapis.com/css?family=Open+Sans' rel='stylesheet' type='text/css'/>
-</head>
-<style>
-
+    <style>
+        [v-cloak] {
+            display: none;
+        }
     table{
 
-        table-layout:fixed;/* 只有定义了表格的布局算法为fixed，下面td的定义才能起作用。 */
-    }
-    td{
-        width:100%;
-        WORD-WRAP: break-word;
-        text-overflow:ellipsis;/* 当对象内文本溢出时显示省略标记(...) ；需与overflow:hidden;一起使用。*/
-    }
-</style>
+            table-layout:fixed;/* 只有定义了表格的布局算法为fixed，下面td的定义才能起作用。 */
+        }
+        td{
+            width:100%;
+            WORD-WRAP: break-word;
+            text-overflow:ellipsis;/* 当对象内文本溢出时显示省略标记(...) ；需与overflow:hidden;一起使用。*/
+        }
+    </style>
+</head>
+
 <body>
 <!--顶部-->
 <div id="wrapper">
-    <div id="app">
+    <div id="app" v-cloak>
         <nav class="navbar navbar-default top-navbar" role="navigation">
             <div class="navbar-header">
                 <a class="navbar-brand" href="index.html">微信自助平台</a>
@@ -76,7 +79,7 @@
                         </a>
                     </li>
                     <li v-if="privileges.user_register">
-                        <a  class="active-menu" href="user.html">
+                        <a   href="user.html">
                             <i class="fa fa-tasks fa-fw"></i> 用户列表
                         </a>
                     </li>
@@ -84,51 +87,38 @@
             </div>
 
         </nav>
-        <!-- /. NAV SIDE  -->
+
         <div id="page-wrapper">
             <div id="page-inner">
+                <a @click="jumpVerify()">外部验证地址</a>
+                <div>
+                    <a href="/download" >客户端下载地址</a>
+                </div>
 
-
-                <div class="row">
-                    <div class="col-md-12">
-                        <!-- Advanced Tables -->
-                        <div class="panel panel-default">
-                            <div class="panel-heading">
-                                主账号验证历史
-                            </div>
-                            <div class="panel-body">
-                                <div class="table-responsive">
-                                    <table class="table table-striped table-bordered table-hover"
-                                           id="dataTables-example">
-                                        <thead>
-                                        <tr >
-                                            <th>用户名</th>
-                                            <th>密钥</th>
-                                            <th>公钥</th>
-                                            <th>创建时间</th>
-                                        </tr>
-                                        </thead>
-                                        <tbody>
-                                        <tr class="odd gradeX" v-for=" item in userList">
-                                            <td>{{item.name}}</td>
-                                            <td>{{item.secretKey}}</td>
-                                            <td>{{item.userKey}}</td>
-                                            <td >{{item.createTime|time}}</td>
-                                        </tr>
-                                        </tbody>
-                                    </table>
-                                </div>
-
-                            </div>
-                        </div>
-                        <!--End Advanced Tables -->
+                <div class="panel-body">
+                    <div class="table-responsive">
+                <table class="table table-striped table-bordered table-hover">
+                    <tr >
+                        <th style="width: 5%">用户名</th>
+                        <th style="width: 40%">密钥</th>
+                        <th style="width: 30%">公钥</th>
+                        <th style="width: 15%">创建时间</th>
+                    </tr>
+                    <tr >
+                        <td style="width: 5%">{{user.name}}</td>
+                        <td style="width: 40%">{{user.secretKey}}</td>
+                        <td style="width: 30%">{{user.userKey}}</td>
+                        <td style="width: 15%">{{user.createTime|time}}</td>
+                    </tr>
+                </table>
                     </div>
                 </div>
 
             </div>
-            <!-- /. PAGE INNER  -->
+
+
         </div>
-        <!-- /. PAGE WRAPPER  -->
+
     </div>
 </div>
 
@@ -147,7 +137,7 @@
             el: '#app',
             data: {
                 privileges: getCacheFromSessionStorage("privileges"),
-                userList:[]
+                user:{}
             },
             filters:{
                 time:function (value) {
@@ -174,21 +164,29 @@
                         s = '0' + s;
                     }
                     <!-- 获取时间格式 2017-01-03 10:13:48 -->
-                     var t = Y+'-'+m+'-'+d+' '+H+':'+i+':'+s;
+                    var t = Y+'-'+m+'-'+d+' '+H+':'+i+':'+s;
                     return t;
                 }
+            },
+            methods: {
+                jumpVerify: function () {
+                    window.location = "verify.html?k=" + app.user.userKey;
+                }
             }
+
         });
         var formData={
         }
-        formPost4Json("/user/getUserList", formData, function (data, httpOptions, status) {
+        formPost4Json("/user/getUserProfile", formData, function (data, httpOptions, status) {
             if (checkErrorDatas(data,httpOptions)) {
-                if(data.userList){
-                    app.userList=data.userList;
+                if(data.user){
+                    app.user=eval(data.user);
                 }
             }
         });
+
     });
+
 
     function logout() {
         var formData={

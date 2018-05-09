@@ -43,9 +43,14 @@ public class VerifyService {
         else  return  list;
     }
 
-    public void addFriendAndSendCode(String phone, String code, HttpServletRequest request) throws CommonException, InterruptedException {
-        Long userId = (Long) request.getSession().getAttribute("userId");
-        User u=userService.getUserById(userId);
+    public void verify(String k,String phone,String code) throws CommonException, InterruptedException {
+        User user=userService.getUserByUserKey(k);
+        if(user==null)
+            throw WechatExceptionHelper.wechatException("非法用户验证", null);
+        commonVerify(user,phone,code);
+    }
+
+    public void commonVerify(User u,String phone,String code) throws CommonException, InterruptedException {
         String clientUser = CacheManager.getCacheService().get(String.format("CLIENT_USER_%s", u.getName()));
         if (StringUtil.isBlank(clientUser)) {
             throw WechatExceptionHelper.wechatException("客户端未登陆", null);
@@ -56,7 +61,7 @@ public class VerifyService {
             throw WechatExceptionHelper.wechatException("验证码不能为空", null);
         Long now = System.currentTimeMillis() / 1000;
         VerifyInfo verifyInfo = new VerifyInfo();
-        verifyInfo.setUserId(userId);
+        verifyInfo.setUserId(u.getId());
         verifyInfo.setVerifyPhone(phone);
         verifyInfo.setVerifyCode(code);
         verifyInfo.setStatus(0);//0创建
@@ -66,7 +71,7 @@ public class VerifyService {
         if (verifyInfo != null) {
             //发起一条消息
             Map<String, Object> verifyMap = new HashMap<>();
-            verifyMap.put("userId", userId);
+            verifyMap.put("userId", u.getId());
             verifyMap.put("verifyInfoId", verifyInfo.getId());
             verifyMap.put("verifyPhone", verifyInfo.getVerifyPhone());
             verifyMap.put("verifyCode", verifyInfo.getVerifyCode());
@@ -74,12 +79,46 @@ public class VerifyService {
         }
     }
 
-    public  void updateVerifyStatus(Long verifyId,Integer status) throws CommonException {
+    public void addFriendAndSendCode(String phone, String code, HttpServletRequest request) throws CommonException, InterruptedException {
+        Long userId = (Long) request.getSession().getAttribute("userId");
+        User u=userService.getUserById(userId);
+        commonVerify(u,phone,code);
+//        String clientUser = CacheManager.getCacheService().get(String.format("CLIENT_USER_%s", u.getName()));
+//        if (StringUtil.isBlank(clientUser)) {
+//            throw WechatExceptionHelper.wechatException("客户端未登陆", null);
+//        }
+//        if (StringUtil.isBlank(phone))
+//            throw WechatExceptionHelper.wechatException("手机号不能为空", null);
+//        if (StringUtil.isBlank(code))
+//            throw WechatExceptionHelper.wechatException("验证码不能为空", null);
+//        Long now = System.currentTimeMillis() / 1000;
+//        VerifyInfo verifyInfo = new VerifyInfo();
+//        verifyInfo.setUserId(userId);
+//        verifyInfo.setVerifyPhone(phone);
+//        verifyInfo.setVerifyCode(code);
+//        verifyInfo.setStatus(0);//0创建
+//        verifyInfo.setCreateTime(now);
+//        verifyInfo.setUpdateTime(now);
+//        verifyInfo = modelDao.insertAndReturn(verifyInfo);
+//        if (verifyInfo != null) {
+//            //发起一条消息
+//            Map<String, Object> verifyMap = new HashMap<>();
+//            verifyMap.put("userId", userId);
+//            verifyMap.put("verifyInfoId", verifyInfo.getId());
+//            verifyMap.put("verifyPhone", verifyInfo.getVerifyPhone());
+//            verifyMap.put("verifyCode", verifyInfo.getVerifyCode());
+//            MqManager.getMq(String.format("VERIFY_FRIEND")).push(JsonMapper.nonEmptyMapper().toJson(verifyMap));
+//        }
+    }
+
+    public  void updateVerifyStatus(Long verifyId,Integer status,String comment) throws CommonException {
         VerifyInfo condition=new VerifyInfo();
         condition.setId(verifyId);
         VerifyInfo update=new VerifyInfo();
         update.setStatus(status);
         update.setUpdateTime(System.currentTimeMillis()/1000);
+        if(!StringUtil.isBlank(comment))
+            update.setComments(comment);
         modelDao.update(update,condition);
     }
 
@@ -95,7 +134,7 @@ public class VerifyService {
                 User user = userService.getUserById(userId);
                 WebSocketServer socketServer=WebSocketServer.getWebSocket(user.getName());
                 socketServer.sendMessage(json);
-                updateVerifyStatus(verifyInfoId,1);
+                updateVerifyStatus(verifyInfoId,1,"");
             } catch (InterruptedException e) {
                 e.printStackTrace();
             } catch (CommonException e) {

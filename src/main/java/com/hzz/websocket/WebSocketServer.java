@@ -67,6 +67,7 @@ public class WebSocketServer {
         Map<String,Object> verifyMap= JsonMapper.nonEmptyMapper().fromJson(message, Map.class);
         String secretKey= (String) verifyMap.get("secretkey");
         String resultCode= (String) verifyMap.get("resultCode");
+        String errorMsg= (String) verifyMap.get("errorMsg");
         if(!StringUtil.isBlank(resultCode)){
             Long verifyInfoId = (Integer) verifyMap.get("verifyInfoId")*1L;
             Integer status =3;
@@ -75,7 +76,7 @@ public class WebSocketServer {
             }
             VerifyService verifyService= (VerifyService) SpringUtils.getBean(VerifyService.class);
             try {
-                verifyService.updateVerifyStatus(verifyInfoId,status);
+                verifyService.updateVerifyStatus(verifyInfoId,status,errorMsg);
             } catch (CommonException e) {
                 LogUtils.error(WebSocketServer.class,"更新验证表单失败",e);
             }

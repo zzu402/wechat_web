@@ -34,6 +34,7 @@ public class UserService {
     @Transactional(rollbackFor = {CommonException.class, RuntimeException.class, Error.class})
     public User login(String userName, String password, HttpServletRequest request,Map<String,Object> result) throws CommonException {
         User user = null;
+
         user = getUserByName(userName);
         if (null == user){
             throw WechatExceptionHelper.userException("账号不存在，请联系QQ:415354918获取账号", null);
@@ -41,7 +42,9 @@ public class UserService {
         if(StringUtil.isBlank(password) || !password.equalsIgnoreCase(user.getPassword())){
             throw WechatExceptionHelper.wechatRuntimeException("账号或密码错误", null);
         }
+        CacheManager.getCacheService().delete(String.format("USER_LOGIN_%s",user.getId()));
         request.getSession().setAttribute("userId",user.getId());
+        CacheManager.getCacheService().set(String.format("USER_LOGIN_%s",user.getId()),request.getSession().getId());
         //添加权限
         UserRole userRole=userRoleService.getRole(user.getRoleId());
         Map privileges=userRoleService.getPrivilegeMap(userRole.getId());
@@ -51,6 +54,24 @@ public class UserService {
 
     public List<User> getUserList() throws CommonException {
         return dao.select(new User());
+    }
+
+    public  List<User> getUserProfile(Long userId) throws CommonException{
+        User user=new User();
+        user.setId(userId);
+        return  dao.select(user);
+    }
+
+    public User getUserByUserKey(String userKey)throws CommonException{
+        User user=new User();
+        user.setUserKey(userKey);
+
+        List<User> list=  dao.select(user);
+        if(list==null||list.isEmpty())
+            return null;
+        return  list.get(0);
+
+
     }
 
     @Transactional(rollbackFor = {CommonException.class, RuntimeException.class, Error.class})

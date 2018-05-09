@@ -14,6 +14,11 @@
     <link href='https://fonts.googleapis.com/css?family=Open+Sans' rel='stylesheet' type='text/css'/>
 </head>
 <body>
+<style  type="text/css">
+    [v-cloak] {
+        display: none;
+    }
+</style>
 <!--顶部-->
 <div id="wrapper">
     <nav class="navbar navbar-default top-navbar" role="navigation">
@@ -29,7 +34,7 @@
                     <i class="fa fa-user fa-fw"></i> <i class="fa fa-caret-down"></i>
                 </a>
                 <ul class="dropdown-menu dropdown-user">
-                    <li><a href="#"><i class="fa fa-user fa-fw"></i>我的资料</a>
+                    <li><a href="/user_profile"><i class="fa fa-user fa-fw"></i>我的资料</a>
                     </li>
 
                     <li><a onclick="logout()"><i class="fa fa-sign-out fa-fw"></i> 注销</a>
@@ -45,7 +50,7 @@
     <!--左侧导航栏-->
 
     <nav class="navbar-default navbar-side" role="navigation">
-        <div class="sidebar-collapse" id="app">
+        <div class="sidebar-collapse" id="app" v-cloak>
             <ul class="nav" id="main-menu">
 
                 <li>
@@ -73,7 +78,7 @@
     <!--中间内容主体-->
     <div id="page-wrapper">
         <div id="page-inner">
-            <div class="well col-md-6 col-centered">
+            <div class="well col-md-12 col-centered">
                 <form class="form-horizontal" role="form">
                     <div class="form-group"><label for="phone" class="col-sm-2 control-label">微信手机号</label>
                         <div class="col-sm-4"><input class="form-control" type="text" id="phone"
