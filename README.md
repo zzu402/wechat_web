@@ -1,0 +1,2 @@
+# wechat_web
+这是wechat项目的核心终端，能够向wechat客户端（wechat或wechat_android项目）即时推送从前台接收到的微信号和验证码。
