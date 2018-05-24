@@ -16,3 +16,5 @@ INSERT INTO `wechat_user_role` VALUES
  INSERT INTO `wechat_user` (`id`, `name`, `password` , `roleId`, `status`, `version`) VALUES
  (1,'admin','c3c6b197f4b113bb777cb0f10c0734ef',1,0,0);
 
+INSERT INTO `wechat_config_info` (`id`, `url` , `password`, `version`) VALUES
+ (1,'https://pan.baidu.com/s/1glVE2Y0g4p4xQTijDDyZVA','q4sb',0);

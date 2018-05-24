@@ -99,3 +99,19 @@ CREATE TABLE `wechat_verify_info` (
   `version` int(11) DEFAULT '0' COMMENT '版本号',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='用户验证表';
+
+ALTER  TABLE wechat_user ADD  expireTime bigint(32) NOT NULL DEFAULT '0' COMMENT '会员到期时间 精确到秒';
+ALTER  TABLE  wechat_user ADD baiduApiId varchar(64) DEFAULT NULL COMMENT '百度ocr识别apiId';
+ALTER  TABLE  wechat_user ADD baiduApiKey varchar(128) DEFAULT NULL COMMENT '百度ocr识别apiKey';
+ALTER  TABLE  wechat_user ADD baiduSecretKey varchar(128) DEFAULT NULL COMMENT '百度ocr识别SecretKey';
+
+DROP TABLE IF EXISTS `wechat_config_info`;
+CREATE TABLE `wechat_config_info` (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT,
+  `status` int(11) NOT NULL DEFAULT '1' COMMENT '1-有效 2-失效',
+  `url` varchar(200) DEFAULT NULL COMMENT '百度下载地址',
+  `password` varchar(20) DEFAULT NULL COMMENT '密码',
+  `createTime` bigint(20) DEFAULT NULL COMMENT '创建时间(秒)',
+  `version` int(11) DEFAULT '0' COMMENT '版本号',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='配置信息';

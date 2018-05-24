@@ -1,9 +1,11 @@
 package com.hzz.controller;
 
 import com.hzz.exception.CommonException;
+import com.hzz.model.ConfigInfo;
 import com.hzz.model.User;
 import com.hzz.security.PrivilegeConstant;
 import com.hzz.security.annotation.Privileges;
+import com.hzz.service.ConfigService;
 import com.hzz.service.UserService;
 import com.hzz.utils.RestResultHelper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,12 +25,16 @@ import java.util.Map;
 public class UserController {
     @Autowired
     private UserService userService;
+    @Autowired
+    private ConfigService configService;
     @RequestMapping(value ="/login", method = RequestMethod.POST)
     public Map<String,Object> login(@RequestParam String userName, @RequestParam String password, HttpServletRequest request) throws CommonException {
         Map<String,Object>result= RestResultHelper.success();
         userService.login(userName,password,request,result);
         return result;
     }
+
+
 
     @Privileges(PrivilegeConstant.USER_REGISTER)
     @RequestMapping(value ="/register", method = RequestMethod.POST)
@@ -53,6 +59,10 @@ public class UserController {
         List<User> userList=userService.getUserProfile(userId);
         if(userList!=null&&!userList.isEmpty())
         result.put("user",userList.get(0));
+        ConfigInfo configInfo=configService.getConfig();
+        if(configInfo!=null){
+            result.put("urlPassword",configInfo.getPassword());
+        }
         return result;
     }
 
@@ -63,4 +73,12 @@ public class UserController {
         request.getSession().removeAttribute("userId");
         return result;
     }
+    @Privileges(PrivilegeConstant.UPDATE_PASSWORD)
+    @RequestMapping(value ="/addBaiduApiInfo", method = RequestMethod.POST)
+    public Map<String,Object> addBaiduApiInfo(@RequestParam String apiId,@RequestParam String apiKey,@RequestParam String secretKey, HttpServletRequest request) throws CommonException {
+        Map<String,Object>result= RestResultHelper.success();
+        userService.addBaiduApiInfo(apiId,apiKey,secretKey,request);
+        return result;
+    }
+
 }

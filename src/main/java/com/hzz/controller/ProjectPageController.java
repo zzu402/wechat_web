@@ -1,8 +1,13 @@
 package com.hzz.controller;
 
+import com.hzz.exception.CommonException;
+import com.hzz.model.ConfigInfo;
 import com.hzz.security.PrivilegeConstant;
 import com.hzz.security.annotation.Privileges;
+import com.hzz.service.ConfigService;
 import com.hzz.utils.LogUtils;
+import com.hzz.utils.StringUtil;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -20,6 +25,8 @@ import java.io.*;
 
 @Controller
 public class ProjectPageController {
+    @Autowired
+    private ConfigService configService;
 
     @RequestMapping(value = "/login", method = RequestMethod.GET)
     public String loginPage() {
@@ -64,36 +71,14 @@ public class ProjectPageController {
 
     @RequestMapping(value = "/download", method = RequestMethod.GET)
     public void download(HttpServletRequest request, HttpServletResponse res) {
-        String fileName = "wechat.zip";
-        res.setHeader("content-type", "application/octet-stream");
-        res.setContentType("application/octet-stream");
-        res.setHeader("Content-Disposition", "attachment;filename=" + fileName);
-        byte[] buff = new byte[1024];
-        BufferedInputStream bis = null;
-        OutputStream os = null;
         try {
-            os = res.getOutputStream();
-            String root=new File(System.getProperty("user.dir")).getParent();
-            LogUtils.info(getClass(),"root url:"+root);
-            bis = new BufferedInputStream(new FileInputStream(new File(root+"//download//"
-                    + fileName)));
-            int i = bis.read(buff);
-            while (i != -1) {
-                os.write(buff, 0, buff.length);
-                os.flush();
-                i = bis.read(buff);
-            }
+            ConfigInfo configInfo=configService.getConfig();
+            if(!StringUtil.isBlank(configInfo.getUrl()))
+                 res.sendRedirect(configInfo.getUrl());
         } catch (IOException e) {
-            LogUtils.error(getClass(),"下载出错",e);
-        } finally {
-            if (bis != null) {
-                try {
-                    bis.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
+            LogUtils.error(getClass(),"跳转到百度网盘失败",e);
+        } catch (CommonException e) {
+            LogUtils.error(getClass(),"获取配置信息失败",e);
         }
-        LogUtils.info(getClass(),"下载成功");
     }
 }

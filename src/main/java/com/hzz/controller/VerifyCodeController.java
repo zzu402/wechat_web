@@ -40,7 +40,7 @@ public class VerifyCodeController {
     @RequestMapping(value ="/common_verify", method = RequestMethod.POST)
     public Map<String,Object> verify(@RequestParam String k,@RequestParam String phone, @RequestParam String code,HttpServletRequest request) throws CommonException, InterruptedException {
         Map<String,Object>result= RestResultHelper.success();
-        verifyService.verify(k,phone,code);
+        verifyService.verify(k,phone,code,request);
         return result;
     }
 

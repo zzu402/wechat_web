@@ -40,6 +40,46 @@ public class User extends AbstractModel<User> {
     private String salt;
     @Column
     private Long roleId;
+    @Column
+    private Long expireTime;
+    @Column
+    private String baiduApiId;
+    @Column
+    private String baiduApiKey;
+    @Column
+    private String baiduSecretKey;
+
+    public Long getExpireTime() {
+        return expireTime;
+    }
+
+    public void setExpireTime(Long expireTime) {
+        this.expireTime = expireTime;
+    }
+
+    public String getBaiduApiId() {
+        return baiduApiId;
+    }
+
+    public void setBaiduApiId(String baiduApiId) {
+        this.baiduApiId = baiduApiId;
+    }
+
+    public String getBaiduApiKey() {
+        return baiduApiKey;
+    }
+
+    public void setBaiduApiKey(String baiduApiKey) {
+        this.baiduApiKey = baiduApiKey;
+    }
+
+    public String getBaiduSecretKey() {
+        return baiduSecretKey;
+    }
+
+    public void setBaiduSecretKey(String baiduSecretKey) {
+        this.baiduSecretKey = baiduSecretKey;
+    }
 
     @Version
     private Integer version;

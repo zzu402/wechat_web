@@ -62,6 +62,7 @@ public class UserService {
         return  dao.select(user);
     }
 
+
     public User getUserByUserKey(String userKey)throws CommonException{
         User user=new User();
         user.setUserKey(userKey);
@@ -172,5 +173,16 @@ public class UserService {
     }
 
 
-
+    public void addBaiduApiInfo(String apiId, String apiKey, String secretKey, HttpServletRequest request) throws CommonException {
+        Long userId= (Long) request.getSession().getAttribute("userId");
+        User user=new User();
+        user.setBaiduApiId(apiId);
+        user.setBaiduApiKey(apiKey);
+        user.setBaiduSecretKey(secretKey);
+        User condition=new User();
+        condition.setId(userId);
+        int i=dao.update(user,condition);
+        if(i<=0)
+            throw WechatExceptionHelper.wechatException("提交失败,请联系管理员",null);
+    }
 }

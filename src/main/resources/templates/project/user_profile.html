@@ -91,8 +91,8 @@
         <div id="page-wrapper">
             <div id="page-inner">
                 <a @click="jumpVerify()">外部验证地址</a>
-                <div>
-                    <a href="/download" >客户端下载地址</a>
+                <div v-if="urlPassword.length>0">
+                    <a href="/download" >客户端下载地址(提取密码：{{urlPassword}})</a>
                 </div>
 
                 <div class="panel-body">
@@ -114,6 +114,28 @@
                     </div>
                 </div>
 
+                <div class="well col-md-12 col-centered">
+                    <form class="form-horizontal" role="form">
+                        <div class="form-group"><label for="apiId" class="col-sm-2 control-label">百度API_ID</label>
+                            <div class="col-sm-4"><input class="form-control" type="text" id="apiId"
+                                                         placeholder="请输入百度API_ID"></div>
+                        </div>
+                        <div class="form-group"><label for="apiKey" class="col-sm-2 control-label">百度API_KEY</label>
+                            <div class="col-sm-4"><input class="form-control" type="text" id="apiKey" placeholder="请输入百度API_KEY">
+                            </div>
+                        </div>
+                        <div class="form-group"><label for="secretKey" class="col-sm-2 control-label">百度SECRET_KEY</label>
+                            <div class="col-sm-4"><input class="form-control" type="text" id="secretKey" placeholder="请输入百度SECRET_KEY">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="col-sm-offset-2 col-sm-10">
+                                <button type="button" onclick="addInfo()" class="btn btn-primary">提交</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+
             </div>
 
 
@@ -123,6 +145,41 @@
 </div>
 
 </body>
+<script>
+
+
+
+    function addInfo() {
+        var apiId = $("#apiId").val();
+        var apiKey = $("#apiKey").val()
+        var secretKey=$("#secretKey").val();
+        if (!apiId) {
+            alert("请输入API_ID");
+            return;
+        }
+        if (!apiKey) {
+            alert("请输入API_KEY");
+            return;
+        }
+        if (!secretKey) {
+            alert("请输入SECRET_KEY");
+            return;
+        }
+        var formData = {
+            "apiId": apiId,
+            "apiKey": apiKey,
+            "secretKey":secretKey
+        }
+        formPost4Json("/user/addBaiduApiInfo", formData, function (data, httpOptions, status) {
+            if (checkErrorDatas(data, httpOptions)) {
+                alert("提交成功!")
+            }
+        });
+    }
+
+
+</script>
+
 
 </html>
 <script src="../assets/js/jquery-1.10.2.js"></script>
@@ -137,7 +194,8 @@
             el: '#app',
             data: {
                 privileges: getCacheFromSessionStorage("privileges"),
-                user:{}
+                user:{},
+                urlPassword:""
             },
             filters:{
                 time:function (value) {
@@ -181,6 +239,9 @@
             if (checkErrorDatas(data,httpOptions)) {
                 if(data.user){
                     app.user=eval(data.user);
+                }
+                if(data.urlPassword){
+                    app.urlPassword=data.urlPassword;
                 }
             }
         });

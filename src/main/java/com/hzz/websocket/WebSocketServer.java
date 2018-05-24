@@ -1,6 +1,7 @@
 package com.hzz.websocket;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArraySet;
@@ -28,8 +29,6 @@ import org.springframework.stereotype.Component;
 public class WebSocketServer {
     //静态变量，用来记录当前在线连接数。应该把它设计成线程安全的。
     private static int onlineCount = 0;
-    //concurrent包的线程安全Set，用来存放每个客户端对应的MyWebSocket对象。
-    private static CopyOnWriteArraySet<WebSocketServer> webSocketSet = new CopyOnWriteArraySet<WebSocketServer>();
     //与某个客户端的连接会话，需要通过它来给客户端发送数据
     private static Map<String,WebSocketServer> webSocketMap=new ConcurrentHashMap<>();
     private Session session;
@@ -39,7 +38,6 @@ public class WebSocketServer {
     @OnOpen
     public void onOpen(@PathParam("user") String user, Session session) {
         this.session = session;
-        webSocketSet.add(this);     //加入set中
         webSocketMap.put(user,this);
         addOnlineCount();           //在线数加1
         LogUtils.info(WebSocketServer.class,"有新连接加入，当前在线人数:"+getOnlineCount());
@@ -49,7 +47,6 @@ public class WebSocketServer {
      */
     @OnClose
     public void onClose(@PathParam("user")String user) {
-        webSocketSet.remove(this);  //从set中删除
         CacheManager.getCacheService().delete(String.format("CLIENT_USER_%s", user));
         webSocketMap.remove(user);
         subOnlineCount();           //在线数减1
@@ -85,9 +82,33 @@ public class WebSocketServer {
                 try {
                     UserService userService = (UserService) SpringUtils.getBean(UserService.class);
                     User u = userService.getUserByName(user);
+                    Long expireTime=u.getExpireTime();
+                    Long now=System.currentTimeMillis()/1000;
                     if (u.getSecretKey().equals(secretKey)) {
-                        CacheManager.getCacheService().set(String.format("CLIENT_USER_%s", user), u.getId().toString());
-                        sendMessage(JsonMapper.nonDefaultMapper().toJson(RestResultHelper.success()));
+                        if(now<expireTime) {
+                            CacheManager.getCacheService().set(String.format("CLIENT_USER_%s", user), u.getId().toString());
+                            Map<String, Object> result = RestResultHelper.success();
+                            if (!StringUtil.isBlank(u.getBaiduApiId()))
+                                result.put("baiduApiId", u.getBaiduApiId());
+                            else {
+                                result.put("baiduApiId", "11164162");
+                            }
+                            if (!StringUtil.isBlank(u.getBaiduApiKey()))
+                                result.put("baiduApiKey", u.getBaiduApiKey());
+                            else {
+                                result.put("baiduApiKey", "QsXNTssGCtucKWtaSQa8fHwv");
+                            }
+                            if (!StringUtil.isBlank(u.getBaiduSecretKey()))
+                                result.put("baiduApiSecretKey", u.getBaiduSecretKey());
+                            else {
+                                result.put("baiduApiSecretKey", "z5KVwRWuwWYYhTVeGDB4jWDeosYxb66G");
+                            }
+                            sendMessage(JsonMapper.nonDefaultMapper().toJson(result));
+                        }else {
+                            CacheManager.getCacheService().delete(String.format("CLIENT_USER_%s", user));
+                            webSocketMap.remove(user);
+                            sendMessage(JsonMapper.nonDefaultMapper().toJson(RestResultHelper.fail("302", "客户端到期,请联系Q：415354918")));
+                        }
                     } else {
                         CacheManager.getCacheService().delete(String.format("CLIENT_USER_%s", user));
                         webSocketMap.remove(user);
@@ -123,15 +144,6 @@ public class WebSocketServer {
             LogUtils.error(WebSocketServer.class,"发送消息异常",e);
         }
     }
-    /**
-     * 群发自定义消息
-     */
-    public static void sendInfo(String message)  {
-        for (WebSocketServer item : webSocketSet) {
-            item.sendMessage(message);
-        }
-    }
-
     public static WebSocketServer getWebSocket(String userName){
         return  webSocketMap.get(userName);
     }
